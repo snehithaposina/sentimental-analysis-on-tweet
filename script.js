@@ -1,27 +1,23 @@
-document.getElementById('analyzeButton').addEventListener('click', function() {
-    let text = document.getElementById('inputText').value.toLowerCase();
+document.getElementById('analyzeButton').addEventListener('click', async function () {
+    const text = document.getElementById('inputText').value;
 
-    // Arrays of sentiment-related keywords
-    const positiveWords = ['happy', 'great', 'excellent', 'good', 'wonderful', 'amazing', 'awesome', 'love', 'fantastic', 'joyful'];
-    const negativeWords = ['sad', 'bad', 'terrible', 'horrible', 'hate', 'awful', 'worst', 'depressing', 'angry', 'upset'];
-    const neutralWords = ['okay', 'fine', 'alright', 'neutral', 'mediocre', 'so-so', 'average', 'indifferent', 'normal', 'standard'];
-    let result = 'Neutral 😐'; // Default to Neutral
-
-    // Check for positive sentiment
-    for (let word of positiveWords) {
-        if (text.includes(word)) {
-            result = 'Positive 😊';
-            break;
-        }
+    if (!text.trim()) {
+        document.getElementById('result').innerText = "Please enter some text!";
+        return;
     }
 
-    // Check for negative sentiment
-    for (let word of negativeWords) {
-        if (text.includes(word)) {
-            result = 'Negative 😞';
-            break;
-        }
-    }
+    try {
+        const response = await fetch('http://127.0.0.1:5000/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
+        });
+        
 
-    document.getElementById('result').innerText = result;
+        const data = await response.json();
+        document.getElementById('result').innerText = data.sentiment;
+    } catch (error) {
+        document.getElementById('result').innerText = "Error analyzing sentiment!";
+        console.error(error);
+    }
 });
